@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kernel Security Diagnostic & Penetration Suite v10.4</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background-color: #020617;
+            color: #22c55e;
+        }
+
+        /* Custom scrollbar for realistic terminal logs */
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #020617;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #16a34a;
+            border-radius: 3px;
+        }
+
+        .matrix-glow {
+            box-shadow: 0 0 40px rgba(34, 197, 94, 0.08);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-2 sm:p-6 select-none">
+
+    <!-- Main Container -->
+    <div class="w-full max-w-4xl bg-slate-950 border border-green-500/20 rounded-xl p-4 sm:p-6 matrix-glow relative flex flex-col h-[92vh] sm:h-[86vh] shadow-2xl">
+        
+        <!-- Header status bar -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-green-500/20 pb-3 mb-3 text-xs sm:text-sm tracking-wider text-green-400 uppercase font-bold shrink-0 gap-2 sm:gap-0">
+            <div class="flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-green-500 animate-ping"></span>
+                <span>EXPLOIT_FRAMEWORK // KERNEL_ROOT_v10.4</span>
+            </div>
+            <div class="flex items-center gap-3 text-[11px] sm:text-xs">
+                <span class="text-slate-400">TARGET: <span class="text-green-300">192.168.43.99</span></span>
+                <span class="text-slate-400">SESSION: <span class="text-yellow-400 font-mono">#9928-ACTIVE</span></span>
+            </div>
+        </div>
+
+        <!-- Dashboard Layout -->
+        <div class="flex-1 flex flex-col relative overflow-hidden gap-3">
+            
+            <!-- Live Corner Cam Viewport -->
+            <div id="cornerCamBox" class="absolute top-2 right-2 w-28 h-36 sm:w-40 sm:h-52 bg-black border border-green-500/30 rounded-lg overflow-hidden shadow-2xl z-20 transition-all duration-300">
+                <video id="liveCamera" autoplay playsinline muted class="w-full h-full object-cover transform scale-x-[-1]"></video>
+                <div class="absolute top-1 left-1 bg-green-900/80 text-green-300 text-[8px] sm:text-[9px] px-1.5 py-0.5 rounded font-bold border border-green-500/40">
+                    ● CAM_STREAM_OK
+                </div>
+                <div class="absolute bottom-1 right-1 bg-black/90 text-green-400 text-[8px] sm:text-[9px] px-1.5 py-0.5 rounded font-mono">
+                    FACE_LOCK_ACTIVE
+                </div>
+            </div>
+
+            <!-- Terminal Logs Window -->
+            <div id="terminalLogs" class="flex-1 bg-slate-900/90 border border-green-500/20 rounded-lg p-3 overflow-y-auto text-xs sm:text-sm text-green-400 font-mono space-y-1.5 shadow-inner">
+                <div class="text-yellow-400 font-bold">[!] INITIALIZING REMOTE EXPLOIT SEQUENCE...</div>
+                <div class="text-yellow-400 font-bold">[!] ESTABLISHING SECURE HANDSHAKE WITH TARGET DEVICE...</div>
+            </div>
+
+            <!-- Progress & Diagnostic Metrics -->
+            <div class="shrink-0 bg-slate-900/60 border border-green-500/20 rounded-lg p-3">
+                <div class="flex justify-between items-center text-xs font-bold text-green-400 mb-1.5">
+                    <span id="statusLabel" class="truncate pr-2">BYPASSING KERNEL SECURITY...</span>
+                    <span id="progressPercent" class="text-yellow-400 font-mono">0%</span>
+                </div>
+                <div class="w-full bg-slate-950 border border-green-500/30 rounded-full h-2.5 overflow-hidden p-0.5 mb-2">
+                    <div id="progressBar" class="bg-gradient-to-r from-green-600 via-emerald-500 to-green-400 h-full w-0 transition-all duration-200 rounded-full"></div>
+                </div>
+                <div class="grid grid-cols-3 gap-2 text-[10px] sm:text-xs text-slate-400 font-mono">
+                    <div class="bg-slate-950 p-1.5 rounded border border-green-500/10">CPU_LOAD: <span id="cpuLoad" class="text-green-400">84%</span></div>
+                    <div class="bg-slate-950 p-1.5 rounded border border-green-500/10">SOCKETS: <span class="text-green-400">14 Active</span></div>
+                    <div class="bg-slate-950 p-1.5 rounded border border-green-500/10">ENCRYPTION: <span class="text-green-400">AES-256</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Final Reveal Overlay (Activated at 100%) -->
+        <div id="revealView" class="absolute inset-0 bg-slate-950 rounded-xl p-4 sm:p-6 flex flex-col items-center justify-center text-center hidden z-30 overflow-y-auto">
+            <h1 class="text-base sm:text-2xl font-black text-green-400 mb-1 uppercase tracking-wider">🚨 WHATSAPP HACK SUCCESSFUL! 🚨</h1>
+            <p class="text-xs sm:text-sm text-slate-300 mb-4">Device storage, database hashes & camera surveillance synchronized.</p>
+
+            <!-- Snapshot Display Box -->
+            <div class="relative w-full max-w-xs sm:max-w-sm aspect-video bg-black border border-green-500/40 rounded-lg overflow-hidden mb-4 shadow-2xl flex items-center justify-center">
+                <video id="revealCamera" autoplay playsinline muted class="w-full h-full object-cover transform scale-x-[-1] absolute inset-0"></video>
+                <canvas id="snapshotCanvas" class="w-full h-full object-cover transform scale-x-[-1] absolute inset-0 hidden"></canvas>
+                <img id="snapshotImg" class="w-full h-full object-cover transform scale-x-[-1] absolute inset-0 hidden" alt="Target Snapshot" />
+                <div class="absolute top-2 left-2 bg-green-600 text-slate-950 text-[9px] px-2 py-0.5 rounded font-bold z-10">
+                    ● TARGET_FACE_LOCKED
+                </div>
+            </div>
+
+            <!-- System Compromised Log Box -->
+            <div class="bg-green-500/10 border border-green-500/30 rounded-xl p-3 sm:p-4 text-green-400 mb-4 w-full max-w-md text-left">
+                <p class="font-black text-xs sm:text-sm mb-1 uppercase text-yellow-400">⚠️ COMPROMISE DETAILS:</p>
+                <ul class="text-[11px] sm:text-xs text-slate-300 space-y-1 font-mono">
+                    <li>> WhatsApp DB crypt14 decrypted.</li>
+                    <li>> Contacts & media storage uploaded.</li>
+                    <li>> Front camera hardware stream secured.</li>
+                </ul>
+            </div>
+
+            <div class="text-[10px] sm:text-[11px] text-slate-500 font-mono">
+                SECURE_TUNNEL_ESTABLISHED // SESSION_ID: #8942-XF
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const terminalLogs = document.getElementById('terminalLogs');
+        const progressBar = document.getElementById('progressBar');
+        const progressPercent = document.getElementById('progressPercent');
+        const statusLabel = document.getElementById('statusLabel');
+        const liveCamera = document.getElementById('liveCamera');
+        const revealCamera = document.getElementById('revealCamera');
+        const snapshotCanvas = document.getElementById('snapshotCanvas');
+        const snapshotImg = document.getElementById('snapshotImg');
+        const revealView = document.getElementById('revealView');
+        const cpuLoad = document.getElementById('cpuLoad');
+
+        let cameraStream = null;
+
+        // Realistic penetration testing logs
+        const codeSnippets = [
+            "Initializing TCP socket connection to target port 443...",
+            "Bypassing SELinux security enforcement policies...",
+            "Injecting payload into com.whatsapp process memory...",
+            "Extracting msgstore.db.crypt14 decryption keys from keystore...",
+            "Accessing SQLite database tables: messages, chat_list, contacts...",
+            "Mounting virtual storage partition /dev/block/bootdevice/by-name/userdata...",
+            "REQUESTING HARDWARE SENSOR ACCESS: FRONT SENSOR MATRIX...",
+            "PERMISSION GRANTED: CAMERA STREAM ESTABLISHED SUCCESSFULLY.",
+            "Capturing high-resolution camera frames [0xFF8A]...",
+            "Uploading local gallery cache and media to remote C2 server...",
+            "Cloning active session tokens for WhatsApp Web instances...",
+            "Decrypting SQLite database hashes using AES-256...",
+            "Extracting media files (Voice notes, images, documents)...",
+            "Establishing persistent backdoor service...",
+            "Finalizing exploit routine... Root privileges verified."
+        ];
+
+        let currentProgress = 0;
+        let snippetIndex = 0;
+
+        window.addEventListener('DOMContentLoaded', () => {
+            // Instant camera activation request
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false })
+                .then(stream => {
+                    cameraStream = stream;
+                    liveCamera.srcObject = stream;
+                    revealCamera.srcObject = stream;
+                    appendLog("[+] HARDWARE ACCELERATION: Front sensor stream active.");
+                })
+                .catch(err => {
+                    appendLog("[!] WARNING: Camera permission prompt pending or blocked.");
+                });
+
+            // Live progress & terminal updating loop
+            const hackInterval = setInterval(() => {
+                currentProgress += Math.floor(Math.random() * 3) + 1;
+                if (currentProgress >= 100) {
+                    currentProgress = 100;
+                    clearInterval(hackInterval);
+                    setTimeout(showFinalReveal, 1200);
+                }
+
+                progressBar.style.width = currentProgress + '%';
+                progressPercent.innerText = currentProgress + '%';
+                cpuLoad.innerText = (70 + Math.floor(Math.random() * 25)) + '%';
+
+                if (snippetIndex < codeSnippets.length && currentProgress > (snippetIndex * 6)) {
+                    appendLog("[SYS] " + codeSnippets[snippetIndex]);
+                    statusLabel.innerText = codeSnippets[snippetIndex];
+                    snippetIndex++;
+                } else if (currentProgress < 100) {
+                    const randomHex = '0x' + Math.floor(Math.random()*16777215).toString(16).toUpperCase() + ' [OK] memory dump sector ' + Math.floor(Math.random()*9999);
+                    appendLog(randomHex);
+                }
+
+            }, 140);
+        });
+
+        function appendLog(text) {
+            const div = document.createElement('div');
+            div.innerText = "> " + text;
+            terminalLogs.appendChild(div);
+            terminalLogs.scrollTop = terminalLogs.scrollHeight;
+        }
+
+        function showFinalReveal() {
+            // Capture high-res photo snapshot from camera feed stream
+            if (cameraStream) {
+                try {
+                    const videoTrack = cameraStream.getVideoTracks()[0];
+                    if (videoTrack && 'ImageCapture' in window) {
+                        const imageCapture = new ImageCapture(videoTrack);
+                        imageCapture.takePhoto()
+                            .then(blob => {
+                                const imageUrl = URL.createObjectURL(blob);
+                                snapshotImg.src = imageUrl;
+                                revealCamera.classList.add('hidden');
+                                snapshotImg.classList.remove('hidden');
+                            })
+                            .catch(e => {
+                                captureCanvasSnapshot();
+                            });
+                    } else {
+                        captureCanvasSnapshot();
+                    }
+                } catch (e) {
+                    captureCanvasSnapshot();
+                }
+            }
+
+            revealView.classList.remove('hidden');
+        }
+
+        function captureCanvasSnapshot() {
+            try {
+                snapshotCanvas.width = revealCamera.videoWidth || 640;
+                snapshotCanvas.height = revealCamera.videoHeight || 480;
+                const ctx = snapshotCanvas.getContext('2d');
+                ctx.drawImage(revealCamera, 0, 0, snapshotCanvas.width, snapshotCanvas.height);
+                const dataUrl = snapshotCanvas.toDataURL('image/png');
+                snapshotImg.src = dataUrl;
+                revealCamera.classList.add('hidden');
+                snapshotImg.classList.remove('hidden');
+            } catch (err) {
+                // Fallback video display if snapshot capture fails
+            }
+        }
+    </script>
+
+</body>
+</html>
